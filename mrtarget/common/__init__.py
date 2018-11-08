@@ -43,7 +43,7 @@ def url_to_tmpfile(url, delete=True, *args, **kwargs):
 
     elif url.startswith('file://') or ('://' not in url):
         filename = url[len('file://'):] if '://' in url else url
-        with open(filename, mode="r+b") as f:
+        with open(filename, mode="rb") as f:
             yield f
 
     else:
