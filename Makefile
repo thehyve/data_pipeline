@@ -13,7 +13,7 @@ mkfile_dir := $(dir $(mkfile_path))
 ES_PREFIX ?= makefile
 ELASTICSEARCH_NODES?=http://localhost:9200
 LOG_LEVEL ?= DEBUG
-SCHEMA_VERSION ?= master
+SCHEMA_VERSION ?= 1.3.0
 NUMBER_TO_KEEP ?= 1000
 
 LOG_PATH ?= $(mkfile_dir)/log

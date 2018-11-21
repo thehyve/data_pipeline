@@ -115,7 +115,7 @@ By default, these will be accessible on http://localhost:9200 and http://localho
 You can run the pipeline with a command like:
 
 ```sh
-docker-compose run --rm mrtarget --dry-run my-elasticsearch-prefix
+docker-compose run --rm mrtarget --schema-version=1.3.0 --dry-run my-elasticsearch-prefix
 ```
 
 or:
@@ -175,7 +175,7 @@ when only a partial execution is desired (e.g. for testing) then the full path w
 It is possible to use both docker and the makefile together. You will need to override the default entrypoint of the docker image. For example:
 
 ```sh
-docker-compose run --rm --entrypoint make mrtarget -j -l 8 -r -R -k all
+docker-compose run --rm --entrypoint=make mrtarget -rR all
 ```
 
 
