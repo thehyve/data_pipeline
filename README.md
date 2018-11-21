@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.com/opentargets/data_pipeline.svg?branch=master)](https://travis-ci.com/opentargets/data_pipeline)
 [quay.io](https://quay.io/repository/opentargets/mrtarget)
 
-## MrT-arget
+# MrT-arget
 
 All code related with the computation of the process needed to
 complete the pipeline are here refactored into a python package.
@@ -10,7 +10,7 @@ We are also building a container with all the python (and nonpython)
 dependencies that allows you to run each step of the pipeline.
 
 
-### How do I decide which data sources to include?
+## How do I decide which data sources to include?
 Sources of evidence strings that are processed by the `--evs` steps by 
 default are specified in a [config file](https://github.com/opentargets/data_pipeline/blob/master/mrtarget/resources/evidences_sources.txt)
 
@@ -64,9 +64,7 @@ Just install via pip `pip install mrtarget` and then you will have a pretty
 ready to use application. Just call `mrtarget -h` and it will work as usual
 previous data_pipeline commands.
 
-```
-
-### db.ini
+#### db.ini
 The backend (Elasticsearch configuration) can be exported as the ENV var
 `ELASTICSEARCH_NODES` as a comma separated list of URLs:
 ```sh
@@ -177,9 +175,6 @@ It is possible to use both docker and the makefile together. You will need to ov
 ```sh
 docker-compose run --rm --entrypoint=make mrtarget -rR all
 ```
-
-
-
 
 ---
 
