@@ -1,10 +1,10 @@
+"""Class to load data to Elasticsearch."""
+
 import random
 from collections import defaultdict
 import time
 import logging
-import tempfile
-import json
-from elasticsearch.exceptions import NotFoundError
+from elasticsearch.exceptions import NotFoundError, ElasticsearchException
 from elasticsearch.helpers import bulk
 from mrtarget.common.DataStructure import JSONSerializable
 from mrtarget.common.EvidenceJsonUtils import assertJSONEqual
@@ -87,20 +87,38 @@ class Loader(object):
             self.flush()
 
     def flush(self, max_retry=10):
+        """Send any buffered records in .cache to the Elasticsearch server.
+
+        Raises ElasticsearchException if the push fails repeatedly.
+        """
         if self.cache:
-            retry = 0
+            retry = time_to_wait = 0
+            last_error = None
             while 1:
                 try:
                     self._flush()
+                    if retry > 0:
+                        self.logger.warning(
+                            'had to retry %(retries)s times, up to %(seconds)d'
+                            ' seconds apart, to push chunk to elasticsearch:'
+                            ' %(error_message)s',
+                            {'retries': retry,
+                             'seconds': time_to_wait,
+                             'error_message': last_error})
                     break
-                except Exception as e:
-                    retry+=1
+                except ElasticsearchException as exception:
+                    retry += 1
                     if retry >= max_retry:
-                        self.logger.exception("push to elasticsearch failed for chunk, giving up...")
-                        raise e
+                        self.logger.exception(
+                            "push to elasticsearch failed for chunk even after"
+                            " %(retries)s retries up to %(seconds)d seconds apart,"
+                            " giving up...",
+                            {'retries': retry,
+                             'seconds': time_to_wait})
+                        raise exception
                     else:
+                        last_error = exception
                         time_to_wait = 5*retry
-                        self.logger.warning("push to elasticsearch failed for chunk: %s.  retrying in %is..."%(str(e),time_to_wait))
                         time.sleep(time_to_wait)
 
             del self.cache[:]
