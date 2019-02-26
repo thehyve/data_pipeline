@@ -13,9 +13,9 @@ from mrtarget.ElasticsearchConfig import ElasticSearchConfiguration
 
 
 
-class Loader():
+class Loader(object):
     """
-    Loads data to elasticsearch
+    Load data to elasticsearch.
     """
 
     def __init__(self,
