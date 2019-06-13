@@ -106,6 +106,8 @@ def setup_ops_parser():
         env_var="VAL_WORKERS_WRITER", action='store', default=4, type=int)
     p.add("--val-queue-validator-writer", help="size of validation writer queue (in chunks)",
         env_var="VAL_QUEUE_VALIDATOR_WRITER", action='store', default=8, type=int)
+    p.add("--val-append-data", help="append to existing data instead of replacing existing data from a previous --val run",
+        env_var="VAL_APPEND_DATA", action='store_true', default=False)
 
     p.add("--as-workers-production", help="# of procs for assocation pair producers",
         env_var="AS_WORKERS_PRODUCTION", action='store', default=4, type=int)

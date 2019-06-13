@@ -3,9 +3,15 @@ import logging
 import time
 
 class ElasticsearchBulkIndexManager(object):
-    def __init__(self, client, index_name, settings = {}, mappings = {}):
+    def __init__(self, client, index_name, settings = {}, mappings = {}, append_data = False):
         """
-        client is an elasticsearch client object
+        :param client: is an elasticsearch client object
+        :param index_name:
+        :param settings:
+        :param mappings:
+        :param append_data: set this to True if you want the data to be appended to the existing index with
+               name index_name instead of replacing this index with an empty index first.
+
         """
         self.logger = logging.getLogger(__name__)
         self.client = client
@@ -17,21 +23,21 @@ class ElasticsearchBulkIndexManager(object):
         #these might or might not be set
         self.settings = settings
         self.mappings = mappings
+        self.append_data = append_data
 
     def __enter__(self):
         #setup
         #ensure the index exists and is empty and ready
         #ignore if index doesn't exist
         if self.client.indices.exists(index=self.index_name):
-            self.logger.debug("deleting prevous index %s", self.index_name)
-            self.client.indices.delete(index=self.index_name, ignore=[404])
-        self.logger.debug("creating index %s", self.index_name)
-        
-        body = {
-            "settings": self.settings,
-            "mappings": self.mappings
-        }
-        self.client.indices.create(index=self.index_name, body=body)
+            # if append_data is False, it means index needs to be replaced instead of appended to,
+            # so delete existing index and create again:
+            if not self.append_data:
+                self.logger.debug("deleting prevous index %s", self.index_name)
+                self.client.indices.delete(index=self.index_name, ignore=[404])
+                self.create_index()
+        else:
+            self.create_index()
 
         #store old settings to restore later, if present
         self.logger.debug("saving old settings for %s", self.index_name)
@@ -91,6 +97,15 @@ class ElasticsearchBulkIndexManager(object):
         #don't return True to indicate any exceptions have been handled
         #this contex manager is only for cleanup
         return None
+
+    def create_index(self):
+        self.logger.debug("creating index %s", self.index_name)
+
+        body = {
+            "settings": self.settings,
+            "mappings": self.mappings
+        }
+        self.client.indices.create(index=self.index_name, body=body)
 
     def wait_for_status(self, desired):
         #TODO implement a timeout?
